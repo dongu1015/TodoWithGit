@@ -2,14 +2,17 @@ import subprocess
 from django.http import JsonResponse
 import json
 
-def commit_view(request):
+def commit_message(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        msg = data.get('message', '기본 메시지')
-
         try:
-            subprocess.run(['git', 'add', '.'])
-            subprocess.run(['git', 'commit', '-m', msg])
-            return JsonResponse({'result': 'success'})
+            data = json.loads(request.body)
+            message = data.get('message', '✅ 기본 커밋 메시지')
+            subprocess.run(['git', 'add', '.'], check=True)
+            subprocess.run(['git', 'commit', '-m', message], check=True)
+            return JsonResponse({'status': 'success', 'message': message})
         except Exception as e:
-            return JsonResponse({'result': 'error', 'detail': str(e)})
+            return JsonResponse({'status': 'fail', 'error': str(e)})
+    return JsonResponse({'status': 'fail', 'reason': 'POST만 허용됩니다'}, status=405)
+
+def get_commit_log(request):
+    return JsonResponse({'message': '리포트 기능 준비 중입니다'})
