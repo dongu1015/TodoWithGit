@@ -1,7 +1,9 @@
 import subprocess
 from django.http import JsonResponse
 import json
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def commit_message(request):
     if request.method == 'POST':
         try:

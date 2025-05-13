@@ -22,4 +22,14 @@
   });
 }
 
+// ✅ 체크박스를 클릭하면 commitToDjango() 실행되도록 이벤트 연결
+	document.querySelectorAll(".todo-list .toggle").forEach(function (checkbox) {
+		checkbox.addEventListener("change", function () {
+			const title = this.closest("li").querySelector("label").textContent;
+			if (this.checked) {
+				commitToDjango(title);
+			}
+		});
+	});
+
 })(window);
