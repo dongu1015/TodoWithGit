@@ -1,19 +1,16 @@
-# TodoMVC App Template
+## 🔧 주제 요약 정리
 
-> Template used for creating [TodoMVC](http://todomvc.com) apps
+-   **기반 오픈소스**: [TodoMVC / Vanilla JS 버전](https://github.com/tastejs/todomvc/tree/master/examples/vanillajs)
+-   **주요 추가 기능**:
+    1. ✅ **To-do 항목 체크 시 Git 커밋 메시지 자동 기록**
+    2. 📅 **주간 리포트 자동 생성 기능** (Markdown or PDF)
+    3. 📊 **완료율 통계 시각화** (선택)
+    4. 🏷️ **태그 기반 할일 필터링 기능** (선택)
+-   **목표**:
 
-![](https://github.com/tastejs/todomvc-app-css/raw/master/screenshot.png)
+    -   오픈소스 기능 분석 + 기능 확장
+    -   GitHub 중심 협업 구조 확립 (브랜치, PR, 이슈 등)
+    -   커밋 기록 기반 리포트 → 자동화 도구 제작
 
-
-## Getting started
-
-- Read the [Application Specification](https://github.com/tastejs/todomvc/blob/master/app-spec.md) before touching the template.
-
-- Delete this file and rename `app-readme.md` to `readme.md` and fill it out.
-
-- Clone this repo and install the dependencies with [npm](https://npmjs.com) by running: `npm install`.
-
-
-## License
-
-<a rel="license" href="http://creativecommons.org/licenses/by/4.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/4.0/80x15.png" /></a><br />This <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" rel="dct:type">work</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="http://sindresorhus.com" property="cc:attributionName" rel="cc:attributionURL">TasteJS</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/deed.en_US">Creative Commons Attribution 4.0 International License</a>.
+-   **https://github.com/tarhi-saad/TodoMVC-Vanilla-ES6**
+-   위 링크의 오픈소스인 ToDoMVC 를 포크하여 개발하였습니다.
