@@ -42,14 +42,16 @@ def commit_message(request): # 커밋 메시지를 받는 api 주소
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            git_type = data.get('git-type', '알 수 없음')  # 이건 지금 알 수 없음이라고 더미데이터를 넣어준거임 초기에 그냥 기본값으로 넣어준거
-            message = data.get('message', '✅ 기본 커밋 메시지')
-            time = data.get('time', '')
-            todo_title = data.get('todo_title', '')
+            git_type = data.get('git-type', 'Unknown')  # 이건 지금 알 수 없음이라고 더미데이터를 넣어준거임 초기에 그냥 기본값으로 넣어준거
+            branch = data.get('branch', 'Unknown')  # 기본 브랜치 이름을 'main'으로 설정
+            message = data.get('message', 'Unknown')
+            time = data.get('time', 'Unknown')
+            todo_title = data.get('todo_title', 'Unknown')
 
             # 받은 데이터 프린트
             print('--- 받은 데이터 ---')
             print(f"깃 타입: {git_type}")     # 여기서 타입이 어떤건지 추가된걸 확인한거임
+            print(f"선택된 브랜치: {branch}")
             print(f"메시지: {message}")
             print(f"시간: {time}")
             print(f"할 일 제목: {todo_title}")
