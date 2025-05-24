@@ -420,6 +420,40 @@ const todoView = () => {
     }
   };
 
+  const createGitControls = (handleCreateBranch, handleDeleteBranch) => {
+    const gitControls = document.createElement('div');
+    gitControls.innerHTML = `
+      <button id="create-branch-btn">브랜치 생성</button>
+      <button id="delete-branch-btn">브랜치 삭제</button>
+    `;
+
+    const target = document.querySelector('.lists') || document.body;
+    target.appendChild(gitControls);
+
+    const createBtn = document.getElementById('create-branch-btn');
+    if (createBtn) createBtn.addEventListener('click', handleCreateBranch);
+
+    const deleteBtn = document.getElementById('delete-branch-btn');
+    if (deleteBtn) deleteBtn.addEventListener('click', handleDeleteBranch);
+  };
+
+  const createRemoteControls = (handleSetRemote, handlePush) => {
+    const remoteControls = document.createElement('div');
+    remoteControls.innerHTML = `
+      <button id="set-remote-btn">🔗 리모트 설정</button>
+      <button id="push-btn">🚀 GitHub에 Push</button>
+    `;
+
+    const target = document.querySelector('.lists') || document.body;
+    target.appendChild(remoteControls);
+
+    const remoteBtn = document.getElementById('set-remote-btn');
+    if (remoteBtn) remoteBtn.addEventListener('click', handleSetRemote);
+
+    const pushBtn = document.getElementById('push-btn');
+    if (pushBtn) pushBtn.addEventListener('click', handlePush);
+  };
+
   const removeProject = (id) => {
     // 선택된 프로젝트가 기본 프로젝트인 경우 모든 할 일 제거
     const selectedProject = getElement('.list.selected');
@@ -1599,6 +1633,8 @@ const todoView = () => {
     bindSearchBlur,
     on,
     off,
+    createGitControls, // ✅ 여기 추가!
+    createRemoteControls, // ✅ 여기 추가!
   };
 };
 

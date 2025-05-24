@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "jest",
-    "start": "webpack-dev-server --open --config ./webpack/webpack.dev.js",
+    "start": "SET NODE_OPTIONS=--openssl-legacy-provider && webpack-dev-server --open --config ./webpack/webpack.dev.js",
     "build": "webpack --config ./webpack/webpack.prod.js"
   },
   "repository": {
