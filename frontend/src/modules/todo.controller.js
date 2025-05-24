@@ -1459,8 +1459,6 @@ const todoController = (() => {
         view.bindSearchBlur(handleSearchBlur);
         // 드래그 앤 드롭 모듈 초기화
         draggable(todoApp, todoLocalStorage);
-        await view.createGitControls(handleCreateBranch, handleDeleteBranch);
-        await view.createRemoteControls(handleSetRemote);
         await view.createRemoteControls(handleSetRemote, handlePush);
     };
 
