@@ -8,6 +8,7 @@ import draggable from './features/draggable/draggable';
 import todoLocalStorage from './config/localStorage';
 
 const todoController = (() => {
+    let userInfo = null;  // 🔥 전역에서 선언해주기!
     /**
      * 헬퍼 함수: 모든 프로젝트 표시
      * @param {Object} view todoView 팩토리로 생성된 뷰 객체
@@ -126,35 +127,38 @@ const todoController = (() => {
 
             modal.innerHTML = `
             <h2>🔧 Git 설정</h2>
-            <p>Git 사용자 정보를 입력해주세요:</p>
+            <p>Git 사용자 정보 및 저장소 경로를 입력해주세요:</p>
             <div class="modal-input-section">
-                <input id="git-username" type="text" placeholder="이름 (user.name)" />
-                <input id="git-email" type="email" placeholder="이메일 (user.email)" />
+                <input id="git-username" type="text" placeholder="이름 (user.name)" /><br />
+                <input id="git-email" type="email" placeholder="이메일 (user.email)" /><br />
+                <input id="git-repo-path" type="text" placeholder="예: C:\\Users\\username\\Desktop\\project" />
             </div>
             <footer>
                 <button id="git-config-submit" class="btn-primary">확인</button>
                 <button id="git-config-cancel">취소</button>
             </footer>
-        `;
+            `;
 
             document.body.appendChild(overlay);
             document.body.appendChild(modal);
 
             modal.querySelector('#git-config-submit').addEventListener('click', () => {
-                const userName = modal.querySelector('#git-username').value.trim();
-                const userEmail = modal.querySelector('#git-email').value.trim();
-                overlay.remove();
-                modal.remove();
-                resolve({ userName, userEmail });
+            const userName = modal.querySelector('#git-username').value.trim();
+            const userEmail = modal.querySelector('#git-email').value.trim();
+            const repoPath = modal.querySelector('#git-repo-path').value.trim();
+            overlay.remove();
+            modal.remove();
+            resolve({ userName, userEmail, repoPath });
             });
 
             modal.querySelector('#git-config-cancel').addEventListener('click', () => {
-                overlay.remove();
-                modal.remove();
-                resolve(null);
+            overlay.remove();
+            modal.remove();
+            resolve(null);
             });
         });
     }
+
 
     // todoView 팩토리 인스턴스화
     let view = null;
@@ -346,6 +350,195 @@ const todoController = (() => {
         // 완료된 할 일은 확인 없이 바로 제거
         removeTodo();
     };
+
+    /**
+     * 브랜치 생성 이벤트 핸들러
+     */
+    const handleCreateBranch = () => {
+    console.log("✅ 클릭됨 - handleCreateBranch 진입");
+
+    const branchName = "test-branch"; // 임시 하드코딩
+    fetch('http://localhost:8000/api/create-branch/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ branch: branchName })
+    })
+        .then((res) => res.json())
+        .then((data) => {
+        console.log("🎉 서버 응답:", data);
+        alert(data.message);
+        })
+        .catch((err) => {
+        console.error("❌ 오류:", err);
+        alert('브랜치 생성 중 오류: ' + err.message);
+        });
+    };
+
+    /**
+     * 브랜치 삭제 이벤트 핸들러
+     */
+    const handleDeleteBranch = () => {
+    const branchName = prompt("삭제할 브랜치 이름?");
+    if (branchName && branchName.trim() !== "") {
+        fetch('http://localhost:8000/api/delete-branch/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ branch: branchName })
+        })
+        .then(res => res.json())
+        .then(data => alert(data.message))
+        .catch(err => alert('브랜치 삭제 중 오류가 발생했습니다: ' + err.message));
+    }
+    };
+
+    const handleSetRemote = async () => {
+    const info = await openRemoteConfigModal();
+        if (!info) return;
+
+        const { username, repo, token } = info;
+
+        const repo_path = userInfo.repoPath; // ✅ 전역 userInfo에서 꺼내야지
+
+        if (!username || !repo || !token || !repo_path) {
+            alert("⚠️ 입력값이 부족합니다.");
+            return;
+        }
+
+        try {
+            const res = await fetch("http://127.0.0.1:8000/set-remote/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username,
+                    repo,
+                    token,
+                    repo_path, // ✅ 이제 백엔드에서도 인식 가능
+                }),
+            });
+
+            const data = await res.json();
+            alert(data.message || data.reason || "응답 메시지가 없습니다.");
+        } catch (err) {
+            alert("❌ 리모트 설정 실패: " + err.message);
+        }
+    };
+
+    function openRemoteConfigModal() {
+        return new Promise((resolve) => {
+            const overlay = document.createElement("div");
+            overlay.className = "modal-backdrop fade-in";
+
+            const modal = document.createElement("div");
+            modal.id = "modal";
+
+            modal.innerHTML = `
+            <h2>🌐 Git Remote 설정</h2>
+            <p>GitHub 정보를 입력하세요:</p>
+            <div class="modal-input-section">
+                <input id="remote-username" type="text" placeholder="GitHub 사용자명 (예: dongu1015)" /><br />
+                <input id="remote-repo" type="text" placeholder="리포지토리명 (예: TodoWithGit)" /><br />
+                <input id="remote-token" type="password" placeholder="액세스 토큰" /><br />
+            </div>
+            <footer>
+                <button id="remote-submit" class="btn-primary">확인</button>
+                <button id="remote-cancel">취소</button>
+            </footer>
+            `;
+
+            document.body.appendChild(overlay);
+            document.body.appendChild(modal);
+
+            modal.querySelector("#remote-submit").addEventListener("click", () => {
+            const username = modal.querySelector("#remote-username").value.trim();
+            const repo = modal.querySelector("#remote-repo").value.trim();
+            const token = modal.querySelector("#remote-token").value.trim();
+            overlay.remove();
+            modal.remove();
+            resolve({ username, repo, token });
+            });
+
+            modal.querySelector("#remote-cancel").addEventListener("click", () => {
+            overlay.remove();
+            modal.remove();
+            resolve(null);
+            });
+        });
+        }
+    const handlePush = async () => {
+        const repoPath = "C:\\Users\\dongwon\\Desktop\\gittest"; // 또는 GIT_REPO_PATH
+
+        try {
+            // 🔹 브랜치 목록 먼저 받아오기
+            const branchRes = await fetch("http://127.0.0.1:8000/get-branches/");
+            const branchData = await branchRes.json();
+
+            if (!branchData.branches || branchData.branches.length === 0) {
+            alert("⚠️ 브랜치 목록을 불러올 수 없습니다.");
+            return;
+            }
+
+            const selectedBranch = await openPushConfirmModal(branchData.branches, repoPath);
+            if (!selectedBranch) return;
+
+            // 🔹 선택된 브랜치로 푸시 요청
+            const res = await fetch("http://127.0.0.1:8000/push/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ repo_path: repoPath, branch: selectedBranch }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+            alert(`✅ 푸시 성공: ${data.message}`);
+            } else {
+            alert(`❌ 푸시 실패: ${data.reason || data.error}`);
+            }
+        } catch (err) {
+            alert("❌ 푸시 중 오류: " + err.message);
+        }
+        };
+    function openPushConfirmModal(branches, repoPath) {
+        return new Promise((resolve) => {
+            const overlay = document.createElement("div");
+            overlay.className = "modal-backdrop fade-in";
+
+            const modal = document.createElement("div");
+            modal.id = "modal";
+
+            modal.innerHTML = `
+            <h2>🚀 GitHub에 푸시</h2>
+            <p>푸시할 브랜치를 선택하세요:</p>
+            <div class="modal-input-section">
+                <label>저장소 경로:</label>
+                <input type="text" id="push-repo-path" value="${repoPath}" readonly /><br />
+                <label>브랜치:</label>
+                <select id="push-branch">
+                ${branches.map(branch => `<option value="${branch}">${branch}</option>`).join("")}
+                </select>
+            </div>
+            <footer>
+                <button id="push-confirm" class="btn-primary">확인</button>
+                <button id="push-cancel">취소</button>
+            </footer>
+            `;
+
+            document.body.appendChild(overlay);
+            document.body.appendChild(modal);
+
+            modal.querySelector("#push-confirm").addEventListener("click", () => {
+            const selectedBranch = modal.querySelector("#push-branch").value;
+            overlay.remove();
+            modal.remove();
+            resolve(selectedBranch);  // 선택된 브랜치 반환
+            });
+
+            modal.querySelector("#push-cancel").addEventListener("click", () => {
+            overlay.remove();
+            modal.remove();
+            resolve(null);
+            });
+        });
+        }
 
     /**
      * 할 일 완료 상태 토글 이벤트 핸들러
@@ -1223,22 +1416,32 @@ const todoController = (() => {
      * 할 일 앱의 기본 상태 설정 및 이벤트 리스너 등록
      */
     const init = async () => {
-        view = todoView();
-        // ✅ Git 사용자 정보 먼저 입력받기
-        const userInfo = await openGitConfigModal();
-        if (userInfo) {
-            await fetch('http://127.0.0.1:8000/setup-git/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_name: userInfo.userName,
-                    user_email: userInfo.userEmail,
-                }),
-            });
-        }
+    view = todoView();
+    userInfo = await openGitConfigModal(); // 전역 변수에 할당!
+
+    if (userInfo) {
+        await fetch('http://127.0.0.1:8000/set-repo-path/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repo_path: userInfo.repoPath }),
+        credentials: 'include',
+        });
+
+        await fetch('http://127.0.0.1:8000/setup-user/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            user_name: userInfo.userName,
+            user_email: userInfo.userEmail,
+        }),
+        credentials: 'include',
+        });
+    }
+    
+
 
         displayLists(view);
-
+        
         // 이벤트 핸들러 등록
         view.bindAddTodo(handleAddTodo);
         view.bindDeleteTodo(handleDeleteTodo);
@@ -1254,9 +1457,11 @@ const todoController = (() => {
         view.bindSearchInput(handleSearchInput);
         view.bindSearchReset(handleSearchReset);
         view.bindSearchBlur(handleSearchBlur);
-
         // 드래그 앤 드롭 모듈 초기화
         draggable(todoApp, todoLocalStorage);
+        await view.createGitControls(handleCreateBranch, handleDeleteBranch);
+        await view.createRemoteControls(handleSetRemote);
+        await view.createRemoteControls(handleSetRemote, handlePush);
     };
 
     return {
