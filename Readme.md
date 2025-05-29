@@ -2,7 +2,7 @@
 
 대구대학교 오픈소스 소프트웨어 강의 프로젝트입니다.
 간단한 Git 학습용 프로젝트입니다. 백엔드와 프론트엔드를 나눠 개발 후 main 브랜치에 통합하였습니다.
-팀원 (김기룡/강동원원)
+팀원 (김기룡/강동원)
 
 > 본 프로젝트는 [TodoMVC-Vanilla-ES6](https://github.com/tarhi-saad/TodoMVC-Vanilla-ES6) 오픈소스를 포크하여 개발되었습니다.
 
@@ -16,9 +16,9 @@
 ---
 
 ## 기술 스택
-- 프론트엔드: HTML, CSS, JS (Vanilla)
+- 프론트엔드: Vanilla JS framework
 - 백엔드: Django
-- Git 연동: GitPython
+- Git 연동: GitPython 
 
 ---
 
